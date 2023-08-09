@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 등록</title>
+</head>
+<body>
+ 
+ <div>
+	<form th:if="${mode.equals('reg')}" th:action="@{insertArticle.do}" method="post">
+		<label>제목</label> <input type="text" name="ntt_sj"><br>
+		<label>내용</label> <input type="text" name="ntt_cn"><br>
+		<!-- 
+		<label>비밀글</label> <input type="checkbox" name="secrete"><br>
+		<label>익명등록</label> <input type="checkbox" name="anonymous"><br>
+		<label>첨부파일</label> <input type="file" name="attc_file"><br><br>
+		-->
+ 		<button type="submit">등록</button>
+ 	</form>
+ 	
+ 	<form th:if="${mode.equals('modi')}" th:action="@{updateArticle.do}" method="patch">
+		<label>제목</label> <input type="text" name="ntt_sj" th:value=${article.ntt_sj}><br>
+		<label>내용</label> <input type="text" name="ntt_cn" th:value=${article.ntt_cn}><br>
+		<label>비밀글</label> <input type="checkbox" name="secrete"><br>
+		<label>익명등록</label> <input type="checkbox" name="anonymous"><br>
+		<label>첨부파일</label> <input type="file" name="attc_file"><br><br>
+		
+ 		<button type="submit">수정</button>
+ 	</form>
+ </div>
+ 
+ 
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 상세 조회</title>
+</head>
+<body>
+ 	 
+	<p><strong>제목 : </strong> <span th:text="${article.ntt_sj}"></span></p>
+	
+	<div>
+		<span><strong>등록자 :</strong> <span th:text="${article.ntcr_id}"></span></span>
+     	<span><strong>등록일 :</strong> <span th:text="${article.frst_regist_pnttm}"></span></span>
+     	<span><strong>조회수 :</strong> <span th:text="${article.rdcnt}"></span></span>
+	</div>
+     
+    <p><strong>내용 :</strong> <span th:text="${article.ntt_cn}"></span></p>
+     
+    <p><strong>게시기간 :</strong> <span th:text="${article.ntce_bgnde + ' ~ ' + article.ntce_endde}"></span></p>
+     
+    
+	<!-- 수정 버튼 --> 
+    <form th:action="@{updateArticleView.do}" method="get">
+		<input type="hidden" name="ntt_id" th:value=${article.ntt_id}>
+ 		<button type="submit">수정</button>
+ 	</form>
+	
+    
+	<!-- 삭제 버튼 -->
+ 	<form th:action="@{deleteArticle.do}" method="get">
+		<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
+ 		<button type="submit">삭제</button>
+ 	</form>
+	
+	
+	<!-- 목록 버튼 -->
+ 	<form th:action="@{selectArticleList.do}" method="get">
+ 		<button type="submit">목록</button>
+ 	</form>
+	
+    
+  
+</body>
+</html>

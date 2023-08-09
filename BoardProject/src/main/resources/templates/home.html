@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 목록 조회</title>
+</head>
+
+
+<body>
+ 
+ <div>
+	<form action="/cop/bbs/insertArticleView.do" method="get">
+ 		<button type="submit">등록</button>
+ 	</form>
+ </div>
+ 
+<div>
+    <table id="articleTable">
+     <thead>
+    <tr>
+         <th>번호</th>
+         <th>제목</th>
+         <th>등록자</th>
+         <th>등록일</th>
+         <th>조회수</th>
+     </tr>
+     </thead>
+     <tbody>
+     <tr th:each=" article : ${list}">
+		 <td th:text="${article.ntt_no}">no</td>
+		 <td>
+			 <a th:href="${'/cop/bbs/selectArticleDetail.do?ntt_id=' + article.ntt_id}" th:text="${article.ntt_sj}"></a>
+         </td>
+         
+         <td th:text="${article.ntcr_id}">id</td>
+         <td th:text="${article.frst_regist_pnttm}">regist</td>
+         <td th:text="${article.rdcnt}">cnt</td>
+     </tr>
+     </tbody>
+     </table>
+</div>
+
+
+ 
+</body>
+</html>
