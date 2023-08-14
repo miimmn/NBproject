@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ public class BoardService {
 	
 	// 게시물 목록 조회
 	@Transactional
-	public List<HashMap<String, Object>> selectArticleList() { 
+	public List<Map<String, Object>> selectArticleList() { 
 		
-		List<HashMap<String, Object>> list = boardDAO.selectArticleList();
+		List<Map<String, Object>> list = boardDAO.selectArticleList();
 		return list;
 	}
 	
@@ -32,8 +33,8 @@ public class BoardService {
 	
 	// 게시물 상세 조회
 	@Transactional
-	public HashMap<String, Object> selectArticleDetail(int ntt_id) { 
-		
+	public Map<String, Object> selectArticleDetail(int ntt_id) { 
+	
 		return boardDAO.selectArticleDetail(ntt_id);
 	}
 	

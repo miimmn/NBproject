@@ -27,7 +27,7 @@
      </thead>
      <tbody>
      <tr th:each=" article : ${list}">
-		 <td th:text="${article.ntt_no}">no</td>
+		 <td th:text="${article.ntt_id}">no</td>
 		 <td>
 			 <a th:href="${'/cop/bbs/selectArticleDetail.do?ntt_id=' + article.ntt_id}" th:text="${article.ntt_sj}"></a>
          </td>

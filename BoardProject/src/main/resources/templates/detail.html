@@ -21,13 +21,14 @@
     
 	<!-- 수정 버튼 --> 
     <form th:action="@{updateArticleView.do}" method="get">
-		<input type="hidden" name="ntt_id" th:value=${article.ntt_id}>
+		<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
+		<input type="hidden" name="mode" th:value="modi">
  		<button type="submit">수정</button>
  	</form>
 	
     
 	<!-- 삭제 버튼 -->
- 	<form th:action="@{deleteArticle.do}" method="get">
+ 	<form th:action="@{deleteArticle.do}" th:method="delete">
 		<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
  		<button type="submit">삭제</button>
  	</form>
