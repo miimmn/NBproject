@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,8 +27,9 @@ import com.example.demo.service.BoardService;
 public class BoardController {
 	
 	@Autowired
-	BoardService boardService;
+	private  BoardService boardService;
 	
+	org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 	
 	// 게시물 목록 조회
 	@GetMapping("selectArticleList.do")
@@ -46,19 +51,40 @@ public class BoardController {
 	
 	// 게시물 등록
 	@PostMapping("insertArticle.do")
-	public String insertArticle(@RequestParam HashMap<String, Object> article) { 
+	public String insertArticle(@RequestParam HashMap<String, Object> article, HttpSession session) { 
 	 	
+		Map<String, Object> user = (Map<String, Object>)session.getAttribute("loginUser");
+		
+		// user 정보 넣기
+		article.put("ntcr_id", user.get("usr_email"));
+		article.put("ntcr_nm", user.get("usr_nm"));
+		article.put("frst_register_id", user.get("usr_email"));
+
 		boardService.insertArticle(article);
 		
 		return "redirect:/cop/bbs/selectArticleList.do";
 	}
 	
-	
 	// 게시물 상세 조회
 	@GetMapping("selectArticleDetail.do")
-	public String selectArticleDetail(@RequestParam int ntt_id, Model model) { 
-					
+	public String selectArticleDetail(@RequestParam int ntt_id, Model model,
+			HttpSession session) { 
+			
+		Map<String, Object> user = (Map<String, Object>) session.getAttribute("loginUser");
 		Map<String, Object> article = boardService.selectArticleDetail(ntt_id);
+		
+		// 자신의 게시물이 아니면 false
+		model.addAttribute("myArticle", false);
+		
+		// 로그인 유저 & 자신의 게시물인 경우 true
+		if( user != null) {
+			String userId = (String)user.get("usr_email");
+			String articleId = (String)article.get("ntcr_id");
+			boolean myArticle = userId.equals(articleId);
+			
+			model.addAttribute("myArticle", myArticle);
+		}
+
 		model.addAttribute("article", article);
 		
 		return "detail";
@@ -83,8 +109,9 @@ public class BoardController {
 		
 		boardService.updateArticle(article);
 		
+		int ntt_id = (int)article.get("ntt_id");
 		// 목록 조회 화면으로 이동한다.
-		return "redirect:/cop/bbs/selectArticleList.do";
+		return "redirect:/cop/bbs/selectArticleDetail.do?ntt_id="+ntt_id;
 	}
 	
 	
@@ -96,12 +123,6 @@ public class BoardController {
 		
 		return "redirect:/cop/bbs/selectArticleList.do";
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 

@@ -21,8 +21,7 @@ public class BoardService {
 	@Transactional
 	public List<Map<String, Object>> selectArticleList() { 
 		
-		List<Map<String, Object>> list = boardDAO.selectArticleList();
-		return list;
+		return boardDAO.selectArticleList();
 	}
 	
 	// 게시물 등록 
@@ -41,7 +40,6 @@ public class BoardService {
 	
 	// 게시물 수정 
 	public void updateArticle(HashMap<String, Object> article) { 
-		
 		boardDAO.updateArticle(article);
 	}
 	

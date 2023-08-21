@@ -1,46 +1,76 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>게시물 목록 조회</title>
+	<meta charset="UTF-8">
+	<title>게시물 목록 조회</title>
+	<meta name="viewport" content="width=device-width, initial-scale = 1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
 
 
 <body>
- 
- <div>
-	<form action="/cop/bbs/insertArticleView.do" method="get">
- 		<button type="submit">등록</button>
- 	</form>
- </div>
- 
-<div>
-    <table id="articleTable">
-     <thead>
-    <tr>
-         <th>번호</th>
-         <th>제목</th>
-         <th>등록자</th>
-         <th>등록일</th>
-         <th>조회수</th>
-     </tr>
-     </thead>
-     <tbody>
-     <tr th:each=" article : ${list}">
-		 <td th:text="${article.ntt_id}">no</td>
-		 <td>
-			 <a th:href="${'/cop/bbs/selectArticleDetail.do?ntt_id=' + article.ntt_id}" th:text="${article.ntt_sj}"></a>
-         </td>
-         
-         <td th:text="${article.ntcr_id}">id</td>
-         <td th:text="${article.frst_regist_pnttm}">regist</td>
-         <td th:text="${article.rdcnt}">cnt</td>
-     </tr>
-     </tbody>
-     </table>
-</div>
+	
+	<nav class="nav justify-content-end nav-dark bg-dark fixed-top">
+		<li class="nav-item">
+			<form th:action="@{signout.do}" method="post">
+				<button type="submit" class="nav-link text-white" >Logout</button>		
+			</form>
+		</li>
+	</nav>
 
 
- 
+
+	<div class="container py-5" style="max-width: 900px ">
+		
+		<div class="pt-5 mt-5 text-center">
+			<h2 class="fw-bold"> 게시물 목록</h2>
+		</div>
+		
+		<div class="d-flex justify-content-end">
+			<form action="/cop/bbs/insertArticleView.do" method="get">
+				<button type="submit" class="btn btn-dark">등록</button>
+			</form>
+		</div>
+		
+		<div>
+			<table class="table table-striped table-hover">
+				<thead class="text-center">
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>등록자</th>
+						<th>등록일</th>
+						<th>조회수</th>
+					</tr>
+				</thead>
+				<tbody class="table-group-divider">
+					<tr th:each=" article : ${list}">
+						<td th:text="${article.ntt_id}">no</td>
+						<td>
+							<a th:href="${'/cop/bbs/selectArticleDetail.do?ntt_id=' + article.ntt_id}"
+								th:text="${article.ntt_sj}"></a>
+						</td>
+
+						<td th:text="${article.ntcr_nm}">id</td>
+						<td th:text="${article.frst_regist_pnttm}">regist</td>
+						<td th:text="${article.rdcnt}">cnt</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+	</div>
+
+
+
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+		crossorigin="anonymous"></script>
 </body>
+
 </html>
