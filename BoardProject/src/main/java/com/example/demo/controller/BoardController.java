@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.LoggerFactory;
@@ -15,25 +17,30 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import com.example.demo.service.BoardService;
+import com.example.demo.service.CommentService;
 
 @Controller
 @RequestMapping("/cop/bbs/")
 public class BoardController {
 	
 	@Autowired
-	private  BoardService boardService;
+	private BoardService boardService;
+	@Autowired
+	private CommentService commentService;
 	
 	org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 	
+	
+	
 	// 게시물 목록 조회
 	@GetMapping("selectArticleList.do")
-	public String selectArticleList(Model model) { 
+	public String selectArticleList(Model model, HttpSession session) { 
 		
 		List<Map<String, Object>> boardlist = boardService.selectArticleList();
 		model.addAttribute("list", boardlist);
@@ -41,13 +48,15 @@ public class BoardController {
 		return "home";
 	}
 	
+	
 	// 게시물 등록 화면
 	@GetMapping("insertArticleView.do")
-	public String insertArticleView(Model model) {
-		
+	public String insertArticleView(HttpSession session ,Model model, HttpServletResponse response) throws Exception {
+				
 		model.addAttribute("mode", "reg");
 		return "register";
 	}
+	
 	
 	// 게시물 등록
 	@PostMapping("insertArticle.do")
@@ -64,6 +73,7 @@ public class BoardController {
 		
 		return "redirect:/cop/bbs/selectArticleList.do";
 	}
+	
 	
 	// 게시물 상세 조회
 	@GetMapping("selectArticleDetail.do")
@@ -83,9 +93,15 @@ public class BoardController {
 			boolean myArticle = userId.equals(articleId);
 			
 			model.addAttribute("myArticle", myArticle);
+			model.addAttribute("loginUser", (String)user.get("usr_email"));
 		}
-
+	
+		// 댓글 목록도 불러오기 ㅇㅇ
+		List<Map<String, Object>> comments = commentService.getCommentList(ntt_id);
+		
 		model.addAttribute("article", article);
+		model.addAttribute("comments", comments);
+		
 		
 		return "detail";
 	}
@@ -102,6 +118,7 @@ public class BoardController {
 		
 		return "register";
 	}
+	
 	
 	// 게시물 수정
 	@PatchMapping("updateArticle.do")
@@ -123,7 +140,5 @@ public class BoardController {
 		
 		return "redirect:/cop/bbs/selectArticleList.do";
 	}
-	
-	
 
 }

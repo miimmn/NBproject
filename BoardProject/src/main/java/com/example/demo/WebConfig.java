@@ -23,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer{
 				.order(2)
 				.addPathPatterns("/cop/bbs/**")
 				.excludePathPatterns("/", "/cop/bbs/selectArticleList.do", "/cop/bbs/selectArticleDetail.do*", 
-					"/cop/bbs/signinView.do", "/cop/bbs/signin.do", "/cop/bbs/signout.do", "/css/**", "/*.ico", "/error" , "/js/**", "/**/*.css", "/**/*.json");
+					 "/cop/bbs/signinView.do", "/cop/bbs/signin.do", "/cop/bbs/signout.do", 
+					 "/css/**", "/*.ico", "/error" , "/js/**", "/**/*.css", "/**/*.json");
 	}
 }

@@ -1,48 +1,34 @@
 package com.example.demo.dao;
 
-
-import java.sql.Connection;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.sql.DataSource;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-
 import com.example.demo.lib.DBConfig;
-import com.example.demo.lib.DBConnect;
+
 
 @Repository
 public class BoardDAO {
 
 	@Autowired
 	DBConfig dbConfig;
-	
-//	private NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dbConfig.dataSource());
-//	private JdbcTemplate jdbcTemplate = new JdbcTemplate(dbConfig.dataSource());
-//	
+
+	org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 
 	// 게시물 목록 조회
 	public List<Map<String, Object>> selectArticleList() {
-		
 
 		String sql = 
 				  "SELECT ntt_id, ntt_no, ntt_sj, ntcr_id, ntcr_nm, frst_regist_pnttm, rdcnt "
 				+ "FROM comtnbbs "
 				+ "ORDER BY frst_regist_pnttm";
 
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dbConfig.dataSource());
-		return jdbcTemplate.queryForList(sql);
+		return dbConfig.getJdbc().queryForList(sql);
+
 	}
 
 	// 게시물 등록
@@ -54,26 +40,21 @@ public class BoardDAO {
 				  "INSERT INTO comtnbbs (ntt_id, ntt_sj, ntt_cn, ntcr_id, ntcr_nm, frst_register_id) "
 				+ "VALUES (:ntt_id, :ntt_sj, :ntt_cn, :ntcr_id, :ntcr_nm, :frst_register_id)";
 
-		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dbConfig.dataSource());
-		namedParameterJdbcTemplate.update(sql, article);
-
+		dbConfig.getNamedParameterJdbc().update(sql, article);
 	}
 
 	// 게시물 상세 조회
 	public Map<String, Object> selectArticleDetail(int ntt_id) {
 
-		String sql = 
-				  "SELECT ntt_id, ntt_sj, ntt_cn, ntcr_nm, ntcr_id, frst_regist_pnttm, rdcnt, ntce_bgnde, ntce_endde "
-				+ "FROM comtnbbs c "
-				+ "WHERE c.ntt_id = :ntt_id";
-
+		// 조회수 증가
 		incrementRdcnt(ntt_id);
 
-		HashMap<String, Object> tempMap = new HashMap<>();
-		tempMap.put("ntt_id", ntt_id);
+		String sql = 
+				  "SELECT ntt_id, ntt_sj, ntt_cn, ntcr_nm, ntcr_id, frst_regist_pnttm, rdcnt, ntce_bgnde, ntce_endde, last_updt_pnttm, last_updusr_id "
+				+ "FROM comtnbbs " 
+			    + "WHERE ntt_id = :ntt_id";
 
-		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dbConfig.dataSource());
-		return namedParameterJdbcTemplate.queryForMap(sql, tempMap);
+		return dbConfig.getNamedParameterJdbc().queryForMap(sql, new MapSqlParameterSource().addValue("ntt_id", ntt_id));
 	}
 
 	// 게시물 수정
@@ -81,89 +62,36 @@ public class BoardDAO {
 
 		// character -> numeric
 		article.put("ntt_id", Integer.parseInt((String) article.get("ntt_id")));
+		article.put("last_updusr_id", article.get("last_updusr_id"));
+		article.put("last_updt_pnttm", LocalDateTime.now());
 
 		String sql = 
 				  "UPDATE comtnbbs "
-				+ "SET ntt_sj = :ntt_sj , ntt_cn = :ntt_cn "
+				+ "SET ntt_sj = :ntt_sj , ntt_cn = :ntt_cn, last_updt_pnttm = :last_updt_pnttm, last_updusr_id = :last_updusr_id "
 				+ "WHERE ntt_id = :ntt_id";
 
-		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dbConfig.dataSource());
-		namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(article));
+		dbConfig.getNamedParameterJdbc().update(sql, new MapSqlParameterSource(article));
 	}
 
 	// 게시물 삭제
 	public void deleteArticle(int ntt_id) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 
-		
-		try {
-			conn = new DBConnect().getConn();
-
-			String sql = " DELETE FROM comtnbbs c " + "WHERE c.ntt_id = ?";
-
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, ntt_id);
-
-			int result = pstmt.executeUpdate();
-			if (result == 1)
-				System.out.println("게시물 삭제 성공!");
-			else
-				System.out.println("게시물 삭제 실패");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-			}
-		}
+		String sql = "DELETE FROM comtnbbs " + "WHERE ntt_id = :ntt_id";
+		dbConfig.getNamedParameterJdbc().update(sql, new MapSqlParameterSource().addValue("ntt_id", ntt_id));
 	}
 
 	// 조회수 증가
 	public void incrementRdcnt(int ntt_id) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			conn = new DBConnect().getConn();
-
-			String sql = " UPDATE comtnbbs " + "SET rdcnt = rdcnt + 1 " + "WHERE ntt_id = ?";
-
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, ntt_id);
-
-			pstmt.executeUpdate();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstmt != null)
-					pstmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-			}
-		}
+		
+		String sql = "UPDATE comtnbbs SET rdcnt = rdcnt + 1 WHERE ntt_id = :ntt_id";
+		dbConfig.getNamedParameterJdbc().update(sql, new MapSqlParameterSource().addValue("ntt_id", ntt_id));
 	}
 
 	// id 설정
 	public int newId() {
 		String sql = "SELECT MAX(ntt_id) FROM comtnbbs";
-		
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dbConfig.dataSource());
-		Integer id = jdbcTemplate.queryForObject(sql, Integer.class);
+		Integer id = dbConfig.getJdbc().queryForObject(sql, Integer.class);
+
 		return id.intValue() + 1;
 	}
 }

@@ -57,7 +57,6 @@ public class UserController {
 		}
 		else return 0;
 		
-//		return "redirect:/cop/bbs/selectArticleList.do";
 		return 1;
 	}
 	

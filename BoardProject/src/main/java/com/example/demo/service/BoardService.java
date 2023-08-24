@@ -40,11 +40,13 @@ public class BoardService {
 	
 	// 게시물 수정 
 	public void updateArticle(HashMap<String, Object> article) { 
+		
 		boardDAO.updateArticle(article);
 	}
 	
 	// 게시물 삭제
 	public void deleteArticle(int ntt_id) { 
+		
 		boardDAO.deleteArticle(ntt_id);
 	}
 	
