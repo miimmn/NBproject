@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale = 1">
+	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 
@@ -21,43 +22,21 @@
 	</nav>
 
 
+
 	<div class="container py-5" style="max-width: 700px">
 
-		<h2 th:if="${mode.equals('reg')}" class="text-center fw-bold pt-5 mt-5"> 게시물 등록</h2>
-		<h2 th:if="${mode.equals('modi')}" class="text-center fw-bold pt-5 mt-5"> 게시물 수정</h2>
-
-		<div>
-			<form th:if="${mode.equals('reg')}" th:action="@{insertArticle.do}" method="post">
-				<label class="form-label">제목</label> <input class="form-control" type="text" name="ntt_sj"><br>
-				<label class="form-label">내용</label>
-				<textarea class="form-control" type="text" rows="4" name="ntt_cn"></textarea>
-				<br>
-
-				<!--
-				<label>비밀글</label> <input type="checkbox" name="secrete"><br>
-				<label>익명등록</label> <input type="checkbox" name="anonymous"><br>
-				-->
-				
-				
-
-				<button type="submit" class="btn btn-primary">등록</button>
-			</form>
+		<h2 id="formTitle" class="text-center fw-bold pt-5 mt-5"></h2>
 
 
+		<div id="inputForm">
+			<label class="form-label">제목</label>
+			<input id="regSj" class="form-control" type="text"><br>
 
-			<form th:if="${mode.equals('modi')}" th:action="@{updateArticle.do}" th:method="patch"
-				style="height: 100vh">
-				<label class="form-label">제목</label> <input class="form-control" type="text" name="ntt_sj"
-					th:value="${article.ntt_sj}"><br>
-				<label class="form-label">내용</label>
-				<textarea class="form-control" th:text="${article.ntt_cn}" type="text" rows="4"
-					name="ntt_cn"></textarea>
+			<label class="form-label">내용</label>
+			<textarea id="regCn" class="form-control" type="text" rows="4"></textarea><br>
 
-				<input type="hidden" name="ntt_id" th:value="${article.ntt_id}"> <br>
-				<button type="submit" class="btn btn-primary m-auto">수정</button>
-			</form>
+			<button id="inputBtn" type="button" class="btn btn-primary">등록</button>
 		</div>
-
 
 	</div>
 
@@ -65,6 +44,79 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous">
 		</script>
+
+
+	<script type="text/javascript">
+		
+
+		const formMode = "[[${mode}]]";
+
+		if (formMode == "reg") {
+
+			$("#formTitle").html("게시물 등록");
+
+			$("#inputBtn").click(function () {
+
+				$.ajax({
+					type: "POST",
+					url: "/cop/bbs/insertArticle.do",
+					data: {
+						"ntt_sj": $("#regSj").val(),
+						"ntt_cn": $("#regCn").val(),
+					},
+					success: function () {
+						location.href = "/cop/bbs/selectArticleList.do";
+					},
+					error: function (request) {
+						var err = JSON.parse(request.responseText);
+
+						location.href = "/cop/bbs/signinView.do";
+						alert(err.message);
+					}
+				})
+			})
+		}
+		
+		else {
+			$("#formTitle").html("게시물 수정");
+
+			const ntt_id = "[[${article?.ntt_id}]]";
+			var ntt_sj = "[[${article?.ntt_sj}]]";
+			var ntt_cn = "[[${article?.ntt_cn}]]";
+
+
+			$("#regSj").attr('value', ntt_sj);
+			$("#regCn").val(ntt_cn);
+
+
+			$("#inputBtn").click(function () {
+
+				$.ajax({
+					type: "PUT",
+					url: "/cop/bbs/updateArticle.do",
+					data: {
+						"ntt_id": ntt_id,
+						"ntt_sj": $("#regSj").val(),
+						"ntt_cn": $("#regCn").val()
+					},
+					error: function (request) {
+
+						if (request.status == 405) {
+							location.href = "/cop/bbs/selectArticleDetail.do?ntt_id=" + ntt_id;
+						}
+						else {
+							var err = JSON.parse(request.responseText);
+
+							location.href = "/cop/bbs/signinView.do";
+							alert(err.message);
+						}
+					}
+				})
+			})
+
+		}
+
+	</script>
 
 </body>
 

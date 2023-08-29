@@ -15,6 +15,10 @@
 
 <body>
 
+
+	<input type="hidden" id="loginUser" th:value="${loginUser}">
+
+
 	<nav class="nav justify-content-end nav-dark bg-dark fixed-top">
 		<li class="nav-item">
 			<form th:action="@{signout.do}" method="post">
@@ -22,6 +26,8 @@
 			</form>
 		</li>
 	</nav>
+
+
 
 
 	<div class="container py-5" style="max-width: 800px">
@@ -81,12 +87,16 @@
 				<button type="submit" class="btn btn-secondary">수정</button>
 			</form>
 
-
-			<!-- 삭제 버튼 -->
 			<form th:if="${myArticle == true}" th:action="@{deleteArticle.do}" th:method="delete">
 				<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
 				<button type="submit" class="btn btn-secondary mx-1">삭제</button>
 			</form>
+
+
+
+			<!--삭제 버튼 (form X)
+			<button id="deleteBtn" type="button" class="btn btn-secondary mx-1">삭제</button>
+			-->
 
 
 			<!-- 목록 버튼 -->
@@ -102,7 +112,7 @@
 		<div class="row pt-3 mt-5">
 
 			<!-- 댓글 개수 -->
-			<div class="ft-bd">Comments : <span th:text="${#lists.size(comments)}"></span></div>
+			<div class="ft-bd">Comments : <span id="cnt" th:text="${#lists.size(comments)}"></span></div>
 
 
 			<!-- 댓글 작성 -->
@@ -117,95 +127,116 @@
 
 
 			<!-- 댓글 목록 출력 -->
-			<div >
-				<div id="cmtList" th:if="${comments != null}" th:each="comment : ${comments}">
-
-					<div>
-						<span th:text="${comment.cmt_register_id}" style="font-weight: bold;"></span>
-						<div th:if="${ comment.cmt_register_id == loginUser}" style=" float: right;">
-							<input type="hidden" id="cmt_id" th:value="${comment.cmt_id}">
-							<button id="deleteComment" type="button" class="btn btn-secondary m-1">X</button>
-						</div>
-					</div>
-
-					<div th:text="${comment.cmt_cn}" style="font-size: small;"> </div>
-					<hr>
-				</div>
+			<div id="cmtView">
+				<div id="cmtList"></div>
 			</div>
-
 		</div>
-
 	</div>
+
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
 		crossorigin="anonymous"></script>
 
 
-
-
-<!--	<script type="text/javascript">-->
+	<!--<script type="text/javascript">-->
 	<script th:inline="javascript">
-		console.log('hello, world');
-		$(function () {
 
-			// 댓글 등록
-			$("#cmtRegisterCheck").click(function () {
+		const loginUser = [[${loginUser}]];
+		var comments = [[${comments}]];
+		getCommentList(comments);
 
-				$.ajax({
-					type: "POST",
-					url: "/cop/bbs/insertComment.do",
-					data: {
-						"cmt_cn": $("#cmt_cn").val(),
-						"ntt_id": $("#ntt_id").val()
-					},
-					success: function (data) {
-						console.log("지영 로그 : data :: ", data);
-						$('#cmt_cn').val('');
-						$('#cmtList').val('');
-						$("#cmtList").replaceWith(data);
-						
-						
-					},
-					error: function (request) {
-						location.href = "/cop/bbs/signinView.do";
-						alert("로그인 후 이용 가능합니다.");
+
+
+		// 댓글 등록
+		$("#cmtRegisterCheck").click(function () {
+
+			$.ajax({
+				type: "POST",
+				url: "/cop/bbs/insertComment.do",
+				data: {
+					"cmt_cn": $("#cmt_cn").val(),
+					"ntt_id": $("#ntt_id").val()
+				},
+				success: function (data) {
+
+					if ($('#cmtList')[0] != null) {
+						// 원래 내용 지우기
+						$('#cmtList')[0].replaceChildren();
 					}
-				})
+					
+					getCommentList(data);
+				},
+				error: function (request) {
+					location.href = "/cop/bbs/signinView.do";
+					alert("로그인 후 이용 가능합니다.");
+				}
 			})
-
-
-			// 댓글 수정 - 아직 ,,,
-
-
-
-
 		})
-		
-	
+
+
+		// 댓글 수정 - 아직 ,,,
 
 
 		// 댓글 삭제
+		function delComment(cmt_id, ntt_id) {
 
-		$("#deleteComment").click(function () {
+			console.log("cmt_id  = ", cmt_id);
+
 			$.ajax({
 				type: "DELETE",
 				url: "/cop/bbs/deleteComment.do",
 				data: {
-					"cmt_id": Number($("#cmt_id").val()),
-					"ntt_id": $("#ntt_id").val()
+					"cmt_id": cmt_id,
+					"ntt_id": ntt_id
+				},
+				success: function (data) {
+
+					// 원래 내용 지우기
+					$('#cmtList')[0].replaceChildren();
+					getCommentList(data);
 				}
 			})
-				.done(function (data) {
-					$('#cmtList').replaceWith(data);
-				});
-		})
+		}
+
+
+		// 댓글 출력 함수
+		function getCommentList(comments) {
+
+			var html = '';
+
+			$.each(comments, function (i, comment) {
+
+				var register_id = comment.cmt_register_id;
+				var cmt_id = comment.cmt_id;
+				var cmt_cn = comment.cmt_cn;
+				var ntt_id = comment.ntt_id;
+
+				var xBtn =
+					'<div style="float: right;">' +
+					'<button id="deleteBtn" type="button" class="btn btn-secondary m-1"' +
+					'onclick="delComment(' + cmt_id + ', ' + ntt_id + ')">X</button>' +
+					'</div>';
+
+
+				html += '<div>';
+				html += '<span ' + 'style="font-weight: bold;">' + register_id + '</span>';
+
+				if (loginUser == register_id) {
+					html += xBtn;
+				}
+				html += '</div>';
+				html += '<div ' + 'style="font-size: small;">' + cmt_cn + '</div>';
+				html += '<hr>';
+			})
+			
+			$("#cmtList").append(html);
+			$("#cnt").text(Object.keys(comments).length);
+			$("#cmt_cn").val('');
+		}
 
 
 	</script>
-
-
-
 
 </body>
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,6 +44,7 @@ public class BoardController {
 	public String selectArticleList(Model model, HttpSession session) { 
 		
 		List<Map<String, Object>> boardlist = boardService.selectArticleList();
+		
 		model.addAttribute("list", boardlist);
 		
 		return "home";
@@ -52,7 +54,6 @@ public class BoardController {
 	// 게시물 등록 화면
 	@GetMapping("insertArticleView.do")
 	public String insertArticleView(HttpSession session ,Model model, HttpServletResponse response) throws Exception {
-				
 		model.addAttribute("mode", "reg");
 		return "register";
 	}
@@ -96,12 +97,12 @@ public class BoardController {
 			model.addAttribute("loginUser", (String)user.get("usr_email"));
 		}
 	
-		// 댓글 목록도 불러오기 ㅇㅇ
+		// 댓글 목록도 불러오기 
 		List<Map<String, Object>> comments = commentService.getCommentList(ntt_id);
 		
 		model.addAttribute("article", article);
 		model.addAttribute("comments", comments);
-		
+		model.addAttribute("loginUser", user.get("usr_email"));
 		
 		return "detail";
 	}
@@ -121,7 +122,7 @@ public class BoardController {
 	
 	
 	// 게시물 수정
-	@PatchMapping("updateArticle.do")
+	@PutMapping("updateArticle.do")
 	public String updateArticle(@RequestParam HashMap<String, Object> article) { 
 		
 		boardService.updateArticle(article);
