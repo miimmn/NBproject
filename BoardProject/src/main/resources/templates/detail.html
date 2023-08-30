@@ -15,10 +15,6 @@
 
 <body>
 
-
-	<input type="hidden" id="loginUser" th:value="${loginUser}">
-
-
 	<nav class="nav justify-content-end nav-dark bg-dark fixed-top">
 		<li class="nav-item">
 			<form th:action="@{signout.do}" method="post">
@@ -119,14 +115,8 @@
 			<hr>
 
 			<!-- 댓글 목록 출력 -->
-			<div id="cmtView">
-				<div id="editForm">
 
-				</div>
-
-				<div id="cmtList">
-
-				</div>
+			<div id="cmtList">
 			</div>
 		</div>
 	</div>
@@ -162,7 +152,7 @@
 
 					if ($('#cmtList')[0] != null) {
 						// 원래 내용 지우기
-						$('#cmtList')[0].replaceChildren();
+						$('#cmtList').html("");
 					}
 
 					getCommentList(data);
@@ -181,14 +171,13 @@
 			$('#cmtContent' + cmt_id).hide();
 
 			var html =
-				'<textarea id="editCmtText" class="form-control" type="text" rows="4">'
+				'<textarea id="editCmtText" class="form-control" type="text" >'
 				+ cmt_cn +
-				'</textarea>' +
-				'<br><button type="submit" class="btn btn-dark mb-3" id="editCommentCheck" style="font-size: small;">'
-				+ '댓글 수정' +
+				'</textarea><br>' +
+				'<button type="submit" class="btn btn-dark mb-3" id="editCommentCheck" style="font-size: small;">'
+				+ '댓글수정' +
 				'</button>';
 			$('#cmt' + cmt_id).append(html);
-
 
 
 			$('#editCommentCheck').click(function () {
@@ -203,7 +192,7 @@
 					},
 					success: function (data) {
 						// 원래 내용 지우기
-						$('#cmtList')[0].replaceChildren();
+						$('#cmtList').html("");
 						getCommentList(data);
 					}
 				})
@@ -212,8 +201,6 @@
 
 		// 댓글 삭제
 		function delComment(cmt_id, ntt_id) {
-
-			console.log("cmt_id  = ", cmt_id);
 
 			$.ajax({
 				type: "DELETE",
@@ -225,7 +212,7 @@
 				success: function (data) {
 
 					// 원래 내용 지우기
-					$('#cmtList')[0].replaceChildren();
+					$('#cmtList').html("");
 					getCommentList(data);
 				}
 			})

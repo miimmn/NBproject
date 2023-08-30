@@ -102,7 +102,7 @@ public class BoardController {
 		
 		model.addAttribute("article", article);
 		model.addAttribute("comments", comments);
-		model.addAttribute("loginUser", user.get("usr_email"));
+		if(user != null) model.addAttribute("loginUser", user.get("usr_email"));
 		
 		return "detail";
 	}
