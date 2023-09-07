@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,8 +34,8 @@ public class BoardController {
 	@Autowired
 	private CommentService commentService;
 	
-	org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 	
+	org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 	
 	
 	// 게시물 목록 조회
@@ -116,7 +115,7 @@ public class BoardController {
 		Map<String, Object> article = boardService.selectArticleDetail(ntt_id);
 		model.addAttribute("article", article);
 		model.addAttribute("mode", "modi");
-		
+	
 		return "register";
 	}
 	
@@ -135,11 +134,10 @@ public class BoardController {
 	
 	// 게시물 삭제
 	@DeleteMapping("deleteArticle.do")
-	public String deleteBoardArticle(@RequestParam String ntt_id) {
+	@ResponseBody
+	public void deleteBoardArticle(@RequestParam String ntt_id) {
 		
 		boardService.deleteArticle(Integer.parseInt(ntt_id));
-		
-		return "redirect:/cop/bbs/selectArticleList.do";
 	}
 
 }

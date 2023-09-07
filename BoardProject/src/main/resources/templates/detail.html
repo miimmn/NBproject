@@ -4,98 +4,64 @@
 <head>
 	<meta charset="UTF-8">
 	<title>게시물 상세 조회</title>
-
-	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
-
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-
 </head>
 
-
 <body>
-
 	<nav class="nav justify-content-end nav-dark bg-dark fixed-top">
 		<li class="nav-item">
+
+			<!--
 			<form th:action="@{signout.do}" method="post">
-				<button type="submit" class="nav-link text-white">Logout</button>
+				<button type="submit" class="nav-link text-white"></button>
 			</form>
+			-->
+
+			<button id="logStateBtn" type="submit" class="nav-link text-white"></button>
+
 		</li>
 	</nav>
 
-
-
-
 	<div class="container py-5" style="max-width: 800px">
-
-
 		<div class="row pt-5 mt-5">
-			<div>
-				<table class="table">
-					<div>
-						<h4> 게시물 상세 정보</h4>
-					</div>
 
-					<thead class="table-primary">
-						<tr>
-							<th style="width: 20%">제목</th>
-							<th style="width: 80%" colspan="2" th:text="${article.ntt_sj}"></th>
-						</tr>
-					</thead>
+			<table class="table">
+				<h4> 게시물 상세 정보</h4>
+				<thead class="table-primary">
+					<tr>
+						<th style="width: 20%">제목</th>
+						<th id="ntt_sj" style="width: 80%" colspan="2"></th>
+					</tr>
+				</thead>
+				<tbody class="table-group-divider">
+					<tr>
+						<td style="width: 20%">등록일</td>
+						<td id="frst_regist_pnttm" style="width: 80%" colspan="2"></td>
+					</tr>
+					<tr>
+						<td style="width: 20%">등록자 </td>
+						<td id="ntcr_nm" style="width: 60%"></td>
+						<td style="width: 20%"> 조회수 :<span id="rdcnt"></span>
+						</td>
+					</tr>
+					<tr style="height: 200px;">
+						<td id="ntt_cn" class="span3" style="width: 100%" colspan="3"></td>
+					</tr>
 
-					<tbody class="table-group-divider">
-						<tr>
-							<td style="width: 20%">등록일</td>
-							<td style="width: 80%" colspan="2" th:text="${article.frst_regist_pnttm}"></td>
-						</tr>
-						<tr>
-							<td style="width: 20%">등록자</td>
-							<td style="width: 60%" th:text="${article.ntcr_nm}"></td>
-							<td style="width: 20%">
-								조회수 :<span th:text="${article.rdcnt}"></span>
-							</td>
-
-						</tr>
-
-						<tr style="height: 200px;">
-							<td class="span3" style="width: 100%" colspan="3" th:text="${article.ntt_cn}"></td>
-						</tr>
-
-						<tr th:if="${ article.last_updt_pnttm != null }">
-							<td style="width: 20%">수정일</td>
-							<td style="width: 80%" colspan="2" th:text="${article.last_updt_pnttm}"></td>
-						</tr>
-
-
-					</tbody>
-				</table>
-			</div>
-
+					<tr th:if="${ article.last_updt_pnttm != null }">
+						<td style="width: 20%">수정일</td>
+						<td id="last_updt_pnttm" style="width: 80%" colspan="2"></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-
 
 		<div class="d-flex justify-content-end py-1">
-
-			<!-- 수정 버튼 -->
-			<form th:if="${myArticle == true}" th:action="@{updateArticleView.do}" method="get">
-				<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
-				<input type="hidden" name="mode" th:value="modi">
-				<button type="submit" class="btn btn-secondary">수정</button>
-			</form>
-
-			<form th:if="${myArticle == true}" th:action="@{deleteArticle.do}" th:method="delete">
-				<input type="hidden" name="ntt_id" th:value="${article.ntt_id}">
-				<button type="submit" class="btn btn-secondary mx-1">삭제</button>
-			</form>
-
-			<!-- 목록 버튼 -->
-			<form th:action="@{selectArticleList.do}" method="get">
-				<button type="submit" class="btn btn-primary">목록</button>
-			</form>
-
+			<button id="editArticleBtn" class="btn btn-secondary">수정</button>
+			<button id="deleteArticleBtn" class="btn btn-secondary mx-1">삭제</button>
+			<button id="listArticleBtn" class="btn btn-primary">목록</button>
 		</div>
-
-
 
 		<!-- 댓글 기능 -->
 		<div class="row pt-3 mt-5">
@@ -103,43 +69,103 @@
 			<!-- 댓글 개수 -->
 			<div class="ft-bd">Comments : <span id="cnt" th:text="${#lists.size(comments)}"></span></div>
 
-
 			<!-- 댓글 작성 -->
 			<div>
-				<textarea class="form-control" type="text" rows="4" id="cmt_cn" placeholder="댓글을 입력하세요."></textarea>
-				<br>
+				<textarea class="form-control" type="text" rows="4" id="cmt_cn"
+					placeholder="댓글을 입력하세요..."></textarea><br>
 				<input type="hidden" id="ntt_id" th:value="${article.ntt_id}">
-				<button type="submit" class="btn btn-dark mb-3" id="cmtRegisterCheck"
+				<button type="submit" class="btn btn-dark mb-3" id="cmtRegisterBtn"
 					style="font-size: small;">댓글작성</button>
 			</div>
 			<hr>
 
 			<!-- 댓글 목록 출력 -->
-
-			<div id="cmtList">
-			</div>
+			<div id="cmtList"></div>
 		</div>
 	</div>
 
 
 
-
+	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
 		crossorigin="anonymous"></script>
-
 
 	<!--<script type="text/javascript">-->
 	<script th:inline="javascript">
 
 		const loginUser = [[${loginUser}]];
 		var comments = [[${comments}]];
+
+		const myArticle = [[${myArticle}]];
+		const article = [[${article}]];
+
+		if (myArticle == false) {
+			$("#editArticleBtn").hide();
+			$("#deleteArticleBtn").hide();
+		}
+
+
+		$("#ntt_sj").text(article.ntt_sj);
+		$("#frst_regist_pnttm").text(article.frst_regist_pnttm);
+		$("#ntcr_nm").text(article.ntcr_nm);
+		$("#rdcnt").text(article.rdcnt);
+		$("#ntt_cn").text(article.ntt_cn);
+
+		if (article.last_updt_pnttm != null) {
+			$("#last_updt_pnttm").text(article.last_updt_pnttm);
+		}
+
+		// 게시물 수정
+		$("#editArticleBtn").click(function () {
+			$.ajax({
+				type: "GET",
+				url: "/cop/bbs/updateArticleView.do",
+				data: {
+					"ntt_id": Number(article.ntt_id)
+				},
+				success: function () {
+					location.href = "/cop/bbs/updateArticleView.do?ntt_id=" + article.ntt_id;
+				}
+			})
+		})
+
+		// 게시물 삭제
+		$("#deleteArticleBtn").click(function () {
+			$.ajax({
+				type: "DELETE",
+				url: "/cop/bbs/deleteArticle.do",
+				data: {
+					"ntt_id": Number(article.ntt_id)
+				},
+				success: function () {
+					location.href = "/cop/bbs/selectArticleList.do";
+				}
+			})
+		})
+
+		// 게시물 목록
+		$("#listArticleBtn").click(function () {
+			$.ajax({
+				type: "GET",
+				url: "/cop/bbs/selectArticleList.do",
+				success: function () {
+					location.href = "/cop/bbs/selectArticleList.do";
+				}
+			})
+		})
+
+
+
+
+
+
+		<!-------- 댓글 파트 -------->
+
 		getCommentList(comments);
 
-
-
 		// 댓글 등록
-		$("#cmtRegisterCheck").click(function () {
+		$("#cmtRegisterBtn").click(function () {
 
 			$.ajax({
 				type: "POST",
@@ -150,8 +176,7 @@
 				},
 				success: function (data) {
 
-					if ($('#cmtList')[0] != null) {
-						// 원래 내용 지우기
+					if ($('#cmtList') != null) {
 						$('#cmtList').html("");
 					}
 
@@ -165,11 +190,12 @@
 		})
 
 
-		// 댓글 수정 - 아직 ,,,
+		// 댓글 수정
 		function editComment(cmt_id, ntt_id, cmt_cn) {
 
 			$('#cmtContent' + cmt_id).hide();
 
+			/*
 			var html =
 				'<textarea id="editCmtText" class="form-control" type="text" >'
 				+ cmt_cn +
@@ -177,8 +203,24 @@
 				'<button type="submit" class="btn btn-dark mb-3" id="editCommentCheck" style="font-size: small;">'
 				+ '댓글수정' +
 				'</button>';
-			$('#cmt' + cmt_id).append(html);
+			*/
 
+
+			var txtAreaTag = $("<textarea>");
+			txtAreaTag.attr("id", "editCmtText")
+				.attr("class", "form-control")
+				.attr("type", "text");
+			txtAreaTag.append(cmt_cn);
+
+			var btnTag = $("<button>");
+			btnTag.attr("type", "submit")
+				.attr("class", "btn btn-dark")
+				.attr("id", "editCommentCheck")
+				.attr("style", "font-size: small;");
+			btnTag.html("댓글수정");
+
+
+			$('#cmt' + cmt_id).append(txtAreaTag).append($("<br>")).append(btnTag);
 
 			$('#editCommentCheck').click(function () {
 
@@ -198,6 +240,7 @@
 				})
 			})
 		}
+
 
 		// 댓글 삭제
 		function delComment(cmt_id, ntt_id) {
@@ -231,23 +274,21 @@
 				var cmt_cn = comment.cmt_cn;
 				var ntt_id = comment.ntt_id;
 
+				/*
 				var xBtn =
 					'<div style="float: right;">' +
-					'<button id="deleteBtn" type="button" class="btn btn-secondary m-1"' +
-					'onclick="delComment(' + cmt_id + ', ' + ntt_id + ')">X</button>' +
+						'<button id="deleteBtn" type="button" class="btn btn-secondary m-1"' +
+						'onclick="delComment(' + cmt_id + ', ' + ntt_id + ')">X</button>' +
 					'</div>';
-
-
+				
 				var editBtn =
 					'<div style="float: right;">' +
-					'<button id="editBtn" type="button" class="btn btn-white m-1 text-primary"' +
-					'onclick="editComment(' + cmt_id + ', ' + ntt_id + ', \'' + cmt_cn + '\' )">수정</button>' +
+						'<button id="editBtn" type="button" class="btn btn-white m-1 text-primary"' +
+						'onclick="editComment(' + cmt_id + ', ' + ntt_id + ', \'' + cmt_cn + '\' )">수정</button>' +
 					'</div>';
-
-
-
+				
 				html += '<div id= cmt' + cmt_id + '>';
-				html += '<span ' + 'style="font-weight: bold;">' + register_id + '</span>';
+				html += 	'<span ' + 'style="font-weight: bold;">' + register_id + '</span>';
 
 				if (loginUser == register_id) {
 					html += xBtn;
@@ -257,18 +298,77 @@
 				html += '</div>';
 				html += '<div id="cmtContent' + cmt_id + '" ' + 'style="font-size: small;">' + cmt_cn + '</div>';
 				html += '<hr>';
+				*/
 
 
+				// 댓글 삭제 버튼
+				var xBtn = $("<div>");
+				xBtn.attr("style", "float: right");
+
+				var btn = $("<button>");
+				btn.attr("id", "deleteBtn")
+					.attr("type", "button")
+					.attr("class", "btn btn-secondary m-1")
+					.attr("onclick", `delComment(${cmt_id}, ${ntt_id})`);
+				btn.append("X");
+				xBtn.append(btn);
+
+
+				// 댓글 수정 버튼
+				var editBtn = $("<div>");
+				editBtn.attr("style", "float: right");
+
+				btn = $("<button>");
+				btn.attr("id", "editBtn")
+					.attr("type", "button")
+					.attr("class", "btn btn-white m-1 text-primary")
+					.attr("onclick", `editComment(${cmt_id}, ${ntt_id}, \"${cmt_cn}\")`);
+				btn.append("수정");
+				editBtn.append(btn);
+
+
+				/* 
+				attr({
+					"src" : "dfdfdfdfdfdf",
+					.
+					.
+					.
+					이렇게도 가능
+					속성은 따옴표 없어도 o
+				});
+				*/
+
+
+				// 댓글 div
+				var cmt = $("<div>");
+				cmt.attr("id", "cmt" + cmt_id);
+
+				// 댓글 작성자
+				var reg_id = $("<span>");
+				reg_id.attr("style", "font-weight: bold");
+				reg_id.append(register_id);
+				cmt.append(reg_id);
+
+				// 본인 댓글
+				if (loginUser == register_id) {
+					cmt.append(xBtn);
+					cmt.append(editBtn);
+				}
+
+				// 댓글 내용
+				var cmtContent = $("<div>");
+				cmtContent.attr("id", "cmtContent" + cmt_id)
+					.attr("style", "font-size: small");
+				cmtContent.append(cmt_cn);
+
+				$("#cmtList").append(cmt).append(cmtContent).append($("<hr>"));
 			})
 
-			$("#cmtList").append(html);
 			$("#cnt").text(Object.keys(comments).length);
 			$("#cmt_cn").val('');
 		}
 
-
 	</script>
-
 </body>
 
 </html>
